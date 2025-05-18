@@ -2,13 +2,14 @@ package com.example.routes
 
 import com.example.models.Users
 import com.example.security.JWTConfig
-import io.ktor.server.routing.*
+import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
-import io.ktor.http.*
+import io.ktor.server.routing.*
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.security.MessageDigest
 
@@ -17,9 +18,24 @@ data class AuthRequest(val username: String, val password: String)
 fun Route.authRoutes() {
     post("/register") {
         val req = call.receive<AuthRequest>()
-        val hash = MessageDigest.getInstance("SHA-256")
-            .digest(req.password.toByteArray())
-            .joinToString("") { "%02x".format(it) }
+
+        val userRow =
+            transaction {
+                Users
+                    .select { (Users.username eq req.username) }
+                    .limit(1)
+                    .firstOrNull()
+            }
+
+        if (userRow != null) {
+            call.respond(HttpStatusCode.BadRequest, "User already exists")
+            return@post
+        }
+
+        val hash =
+            MessageDigest.getInstance("SHA-256")
+                .digest(req.password.toByteArray())
+                .joinToString("") { "%02x".format(it) }
         transaction {
             Users.insert {
                 it[username] = req.username
@@ -31,16 +47,18 @@ fun Route.authRoutes() {
 
     post("/login") {
         val req = call.receive<AuthRequest>()
-        val hash = MessageDigest.getInstance("SHA-256")
-            .digest(req.password.toByteArray())
-            .joinToString("") { "%02x".format(it) }
+        val hash =
+            MessageDigest.getInstance("SHA-256")
+                .digest(req.password.toByteArray())
+                .joinToString("") { "%02x".format(it) }
 
-        val userRow = transaction {
-            Users
-                .select { (Users.username eq req.username) and (Users.password eq hash) }
-                .limit(1)
-                .firstOrNull()
-        }
+        val userRow =
+            transaction {
+                Users
+                    .select { (Users.username eq req.username) and (Users.password eq hash) }
+                    .limit(1)
+                    .firstOrNull()
+            }
 
         if (userRow == null) {
             call.respond(HttpStatusCode.Unauthorized, "Invalid credentials")

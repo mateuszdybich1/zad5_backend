@@ -15,19 +15,20 @@ object JWTConfig {
     fun initialize(config: ApplicationConfig) {
         val jwt = config.config("jwt")
         algorithm = Algorithm.HMAC256(jwt.property("secret").getString())
-        issuer    = jwt.property("issuer").getString()
-        validityMs= jwt.property("validity_ms").getString().toLong()
+        issuer = jwt.property("issuer").getString()
+        validityMs = jwt.property("validity_ms").getString().toLong()
     }
 
-    fun makeToken(userId: String): String = JWT.create()
-        .withIssuer(issuer)
-        .withClaim("userId", userId)
-        .withExpiresAt(Date(System.currentTimeMillis() + validityMs))
-        .sign(algorithm)
+    fun makeToken(userId: String): String =
+        JWT.create()
+            .withIssuer(issuer)
+            .withClaim("userId", userId)
+            .withExpiresAt(Date(System.currentTimeMillis() + validityMs))
+            .sign(algorithm)
 
     fun configure(auth: AuthenticationConfig) {
         auth.jwt("auth-jwt") {
-            realm    = issuer
+            realm = issuer
             verifier(JWT.require(algorithm).withIssuer(issuer).build())
             validate { cred ->
                 val uid = cred.payload.getClaim("userId").asString()
