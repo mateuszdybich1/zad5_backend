@@ -1,5 +1,5 @@
-val kotlin_version: String by project
-val logback_version: String by project
+val kotlinVersion: String by project
+val logbackVersion: String by project
 val exposedVersion: String by project
 val mssqlJdbcVersion: String by project
 
@@ -26,14 +26,14 @@ repositories {
 dependencies {
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-netty")
-    implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("ch.qos.logback:logback-classic:$logbackVersion")
     implementation("io.ktor:ktor-server-core")
     implementation("io.ktor:ktor-server-config-yaml")
-    implementation("io.ktor:ktor-server-auth:$kotlin_version")
-    implementation("io.ktor:ktor-server-auth-jwt:$kotlin_version")
-    implementation("io.ktor:ktor-server-content-negotiation:$kotlin_version")
-    implementation("io.ktor:ktor-serialization-jackson:$kotlin_version")
-    implementation("io.ktor:ktor-server-cors:$kotlin_version")
+    implementation("io.ktor:ktor-server-auth:$kotlinVersion")
+    implementation("io.ktor:ktor-server-auth-jwt:$kotlinVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$kotlinVersion")
+    implementation("io.ktor:ktor-serialization-jackson:$kotlinVersion")
+    implementation("io.ktor:ktor-server-cors:$kotlinVersion")
 
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
