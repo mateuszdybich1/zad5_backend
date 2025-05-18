@@ -1,0 +1,17 @@
+ktor:
+  deployment:
+    port: 8080
+  application:
+    modules:
+      - com.example.ApplicationKt.module
+
+database:
+  url: "$DB_HOST"
+  driver: "com.microsoft.sqlserver.jdbc.SQLServerDriver"
+  user: "$DB_USER"
+  password: "$DB_PASSWORD"
+
+jwt:
+  secret: "$JWT_SECRET"
+  issuer: "$JWT_ISSUER"
+  validity_ms: 86400000
